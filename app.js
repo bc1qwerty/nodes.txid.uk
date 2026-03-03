@@ -72,7 +72,7 @@ async function loadNodeDetail(pubkey){
   try{
     const n=await fetch(`${API}/v1/lightning/nodes/${pubkey}`,{signal:AbortSignal.timeout(10000)}).then(r=>r.json());
     el.innerHTML=`
-      <div class="nd-title">⚡ ${escHtml(n.alias)||pubkey.slice(0,20)+'…'}</div>
+      <div class="nd-title">${escHtml(n.alias)||pubkey.slice(0,20)+'…'}</div>
       <div class="nd-grid">
         <div class="nd-item"><div class="nd-key">Public Key</div><div class="nd-val" style="font-size:.62rem;word-break:break-all">${pubkey}</div></div>
         <div class="nd-item"><div class="nd-key">총 용량</div><div class="nd-val">${((n.capacity||0)/1e8).toFixed(4)} BTC</div></div>
