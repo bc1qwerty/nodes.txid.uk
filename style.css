@@ -25,7 +25,7 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
 .nav-links a:hover { color: var(--accent); background: rgba(247,147,26,.06); }
 .nav-links a.active { color: var(--accent); background: rgba(247,147,26,.08); }
 .nav-links a.active::after { width: 60%; }
-.tools-dropdown:hover .content{max-width:var(--max-w);margin:0 auto;padding:0 20px 60px;}
+.content{max-width:var(--max-w);margin:0 auto;padding:0 24px 60px;}
 .search-row{display:flex;gap:10px;margin-bottom:24px;}
 .search-row .input{flex:1;}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
