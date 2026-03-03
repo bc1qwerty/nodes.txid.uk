@@ -38,7 +38,7 @@ async function init(){
     `;
     renderTopNodes(nodes);
     loadHistory();
-  }catch(e){document.getElementById('global-stats').innerHTML=`<div class="empty">데이터 로드 실패: ${e.message}</div>`;}
+  }catch(e){document.getElementById('global-stats').innerHTML=`<div class="empty">데이터 로드 실패: ${String(e.message).replace(/</g,'&lt;')}</div>`;}
 }
 
 function renderTopNodes(nodes){
