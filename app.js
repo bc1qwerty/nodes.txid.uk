@@ -65,7 +65,7 @@ async function init(){
 
 function renderTopNodes(nodes){
   const el=document.getElementById('top-nodes');
-  el.innerHTML=(nodes||[]).slice(0,20).map((n,i)=>`
+  el.innerHTML=(nodes||[]).slice(0, window.innerWidth<600 ? 10 : 20).map((n,i)=>`
     <div class="node-row" onclick="loadNodeDetail('${n.publicKey}')">
       <span class="node-rank">#${i+1}</span>
       <span class="node-alias">${escHtml(n.alias)||n.publicKey.slice(0,16)+'…'}</span>

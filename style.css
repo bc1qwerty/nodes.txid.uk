@@ -68,4 +68,7 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
   .content{padding:0 12px 60px;}
   .stats-grid{grid-template-columns:repeat(2,1fr);}
   .two-col{grid-template-columns:1fr;}
+  .card{padding:12px;}
+  #top-nodes{max-height:320px;overflow-y:auto;}
+  #network-chart{max-height:160px !important;}
 }
