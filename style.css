@@ -56,3 +56,13 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
 .lang-menu.open{display:block;}
 .lang-menu button{display:block;width:100%;text-align:left;padding:8px 14px;background:none;border:none;color:var(--text2);font-family:var(--font-ko);font-size:.78rem;cursor:pointer;transition:background .15s,color .15s;}
 .lang-menu button:hover{background:var(--bg3);color:var(--accent);}
+
+@media(max-width:600px){
+  .node-row{flex-wrap:wrap;gap:4px;}
+  .node-alias{width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .node-cap{font-size:.68rem;}
+  .node-ch{font-size:.62rem;}
+  .content{padding:0 12px 60px;}
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+  .two-col{grid-template-columns:1fr;}
+}
