@@ -109,37 +109,23 @@ async function loadNodeDetail(pubkey){
 
 async function loadHistory(){
   try{
-    const hist=await fetch(`${API}/v1/lightning/statistics/2y`,{signal:AbortSignal.timeout(15000)}).then(r=>r.json());
-    const canvas=document.getElementById('network-chart');
-    const ctx=canvas.getContext('2d');
-    const W=canvas.offsetWidth||400;const H=200;
-    canvas.width=W*2;canvas.height=H*2;ctx.scale(2,2);
-    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
-    ctx.fillStyle=isDark?'#161b22':'#fff';ctx.fillRect(0,0,W,H);
-    if(!Array.isArray(hist)||!hist.length)return;
-    const data=hist.slice(-52);
-    // node_count 없으면 clearnet+tor+unannounced 합산
-    const getNodes=d=>(d.node_count||(d.clearnet_nodes||0)+(d.tor_nodes||0)+(d.unannounced_nodes||0)+(d.clearnet_tor_nodes||0));
-    const maxNodes=Math.max(...data.map(d=>getNodes(d)));
-    if(!maxNodes)return;
-    // 채널 수 (보조선, 파란색)
-    const maxCh=Math.max(...data.map(d=>d.channel_count||0));
-    ctx.strokeStyle=isDark?'#388bfd':'#0969da';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();
-    data.forEach((d,i)=>{
-      const x=20+i*(W-40)/data.length;const y=H-20-((d.channel_count||0)/maxCh)*(H-30);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.stroke();ctx.setLineDash([]);
-    // 노드 수 (주선, 오렌지)
-    ctx.strokeStyle='#f7931a';ctx.lineWidth=1.5;ctx.beginPath();
-    data.forEach((d,i)=>{
-      const x=20+i*(W-40)/data.length;const y=H-20-(getNodes(d)/maxNodes)*(H-30);
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    });
-    ctx.stroke();
-    ctx.fillStyle=isDark?'#8b949e':'#656d76';ctx.font='9px monospace';
-    ctx.textAlign='left';ctx.fillText('— 노드  - - 채널', 22, 14);
-    ctx.textAlign='right';ctx.fillText(maxNodes.toLocaleString()+'노드', W-4, 14);
+    const d=await fetch(`${API}/v1/lightning/statistics/2y`,{signal:AbortSignal.timeout(15000)}).then(r=>r.json());
+    const el=document.getElementById('network-chart');
+    if(!Array.isArray(d)||!d.length)return;
+    const cur=d[0],old=d[d.length-1];
+    const getNodes=x=>(x.clearnet_nodes||0)+(x.tor_nodes||0)+(x.unannounced_nodes||0)+(x.clearnet_tor_nodes||0);
+    const chDiff=cur.channel_count-old.channel_count;
+    const ndDiff=getNodes(cur)-getNodes(old);
+    const capDiff=(cur.total_capacity-old.total_capacity)/1e8;
+    const sign=v=>v>0?'+':'';
+    el.innerHTML=`
+      <div class="bs-row"><span class="bs-key">총 노드 수</span><span class="bs-val">${getNodes(cur).toLocaleString()} <small style="color:${ndDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(ndDiff)}${ndDiff.toLocaleString()}</small></span></div>
+      <div class="bs-row"><span class="bs-key">Clearnet</span><span class="bs-val">${(cur.clearnet_nodes||0).toLocaleString()}</span></div>
+      <div class="bs-row"><span class="bs-key">Tor</span><span class="bs-val">${(cur.tor_nodes||0).toLocaleString()}</span></div>
+      <div class="bs-row"><span class="bs-key">채널 수</span><span class="bs-val">${cur.channel_count.toLocaleString()} <small style="color:${chDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(chDiff)}${chDiff.toLocaleString()}</small></span></div>
+      <div class="bs-row"><span class="bs-key">총 용량</span><span class="bs-val">${((cur.total_capacity||0)/1e8).toFixed(0)} BTC <small style="color:${capDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(capDiff)}${capDiff.toFixed(0)}</small></span></div>
+      <div class="bs-row"><span class="bs-key">기준</span><span class="bs-val" style="font-size:.65rem">2년 전 대비 변화</span></div>
+    `;
   }catch{}
 }
 
