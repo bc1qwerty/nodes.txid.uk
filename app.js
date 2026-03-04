@@ -118,16 +118,28 @@ async function loadHistory(){
     ctx.fillStyle=isDark?'#161b22':'#fff';ctx.fillRect(0,0,W,H);
     if(!Array.isArray(hist)||!hist.length)return;
     const data=hist.slice(-52);
-    const maxNodes=Math.max(...data.map(d=>d.node_count||0));
+    // node_count 없으면 clearnet+tor+unannounced 합산
+    const getNodes=d=>(d.node_count||(d.clearnet_nodes||0)+(d.tor_nodes||0)+(d.unannounced_nodes||0)+(d.clearnet_tor_nodes||0));
+    const maxNodes=Math.max(...data.map(d=>getNodes(d)));
+    if(!maxNodes)return;
+    // 채널 수 (보조선, 파란색)
+    const maxCh=Math.max(...data.map(d=>d.channel_count||0));
+    ctx.strokeStyle=isDark?'#388bfd':'#0969da';ctx.lineWidth=1;ctx.setLineDash([3,3]);ctx.beginPath();
+    data.forEach((d,i)=>{
+      const x=20+i*(W-40)/data.length;const y=H-20-((d.channel_count||0)/maxCh)*(H-30);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.stroke();ctx.setLineDash([]);
+    // 노드 수 (주선, 오렌지)
     ctx.strokeStyle='#f7931a';ctx.lineWidth=1.5;ctx.beginPath();
     data.forEach((d,i)=>{
-      const x=20+i*(W-40)/data.length;const y=H-20-(d.node_count/maxNodes)*(H-30);
+      const x=20+i*(W-40)/data.length;const y=H-20-(getNodes(d)/maxNodes)*(H-30);
       i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
     });
     ctx.stroke();
     ctx.fillStyle=isDark?'#8b949e':'#656d76';ctx.font='9px monospace';
-    ctx.textAlign='left';ctx.fillText('노드 수 (1년)', 22, 14);
-    ctx.textAlign='right';ctx.fillText(maxNodes.toLocaleString(), W-4, 14);
+    ctx.textAlign='left';ctx.fillText('— 노드  - - 채널', 22, 14);
+    ctx.textAlign='right';ctx.fillText(maxNodes.toLocaleString()+'노드', W-4, 14);
   }catch{}
 }
 
