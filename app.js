@@ -1,4 +1,5 @@
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+async function fetchRetry(url,timeout,retries){for(let i=0,m=retries||2;i<=m;i++){try{return await fetch(url,{signal:AbortSignal.timeout(timeout||10000)});}catch(e){if(i>=m)throw e;await new Promise(r=>setTimeout(r,1000<<i));}}}
 'use strict';
 
 // ── 언어 ──
@@ -18,8 +19,8 @@ function setLang(l){
     if(val) el.textContent=val;
   });
 }
-function toggleLang(){document.getElementById('lang-menu')?.classList.toggle('open');}
-document.addEventListener('click',e=>{const m=document.getElementById('lang-menu');if(m&&!e.target.closest('.lang-dropdown'))m.classList.remove('open');});
+function toggleLang(){const m=document.getElementById('lang-menu');m?.classList.toggle('open');document.getElementById('lang-btn')?.setAttribute('aria-expanded',m?.classList.contains('open')||false);}
+document.addEventListener('click',e=>{const m=document.getElementById('lang-menu');if(m&&!e.target.closest('.lang-dropdown')){m.classList.remove('open');document.getElementById('lang-btn')?.setAttribute('aria-expanded','false');}});
 (function(){setLang(lang);})();
 
 const API='https://mempool.space/api';
@@ -46,8 +47,8 @@ async function init(){
   document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:20px;color:var(--text3)">로딩 중…</div>';
   try{
     const[stats,nodes]=await Promise.all([
-      fetch(`${API}/v1/lightning/statistics/latest`,{signal:AbortSignal.timeout(10000)}).then(r=>r.json()),
-      fetch(`${API}/v1/lightning/nodes/rankings/connectivity`,{signal:AbortSignal.timeout(10000)}).then(r=>r.json()),
+      fetchRetry(`${API}/v1/lightning/statistics/latest`,10000).then(r=>r.json()),
+      fetchRetry(`${API}/v1/lightning/nodes/rankings/connectivity`,10000).then(r=>r.json()),
     ]);
     const s=stats.latest||stats||{};
     document.getElementById('global-stats').innerHTML=`
@@ -60,7 +61,7 @@ async function init(){
     `;
     renderTopNodes(nodes);
     loadHistory();
-  }catch(e){document.getElementById('global-stats').innerHTML=`<div class="empty">데이터 로드 실패: ${String(e.message).replace(/</g,'&lt;')}</div>`;}
+  }catch(e){console.error('init error:', e); document.getElementById('global-stats').innerHTML=`<div class="empty">데이터를 불러올 수 없습니다. <button onclick="init()" style="margin-left:8px;padding:2px 8px;font-size:.72rem;cursor:pointer">재시도</button></div>`;}
 }
 
 function renderTopNodes(nodes){
@@ -80,19 +81,19 @@ async function searchNode(){
   document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:16px;color:var(--text3)">검색 중…</div>';
   if(/^[0-9a-f]{66}$/.test(q)){await loadNodeDetail(q);return;}
   try{
-    const res=await fetch(`${API}/v1/lightning/search?searchText=${encodeURIComponent(q)}&resultAmount=10`).then(r=>r.json());
+    const res=await fetchRetry(`${API}/v1/lightning/search?searchText=${encodeURIComponent(q)}&resultAmount=10`,10000).then(r=>r.json());
     const nodes=res.nodes||[];
     if(!nodes.length){document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:16px;color:var(--text3)">검색 결과가 없습니다.</div>';return;}
     if(nodes.length===1){await loadNodeDetail(nodes[0].publicKey);return;}
     renderTopNodes(nodes);
-  }catch(e){document.getElementById('top-nodes').innerHTML=`<div class="empty" style="padding:16px;color:var(--red)">검색 오류: ${escHtml(e.message)}</div>`;}
+  }catch(e){console.error('searchNode error:', e); document.getElementById('top-nodes').innerHTML=`<div class="empty" style="padding:16px;color:var(--red)">검색 중 오류가 발생했습니다.</div>`;}
 }
 
 async function loadNodeDetail(pubkey){
   const el=document.getElementById('node-detail');
   el.style.display='block';el.innerHTML='<div class="empty">로딩 중…</div>';
   try{
-    const n=await fetch(`${API}/v1/lightning/nodes/${pubkey}`,{signal:AbortSignal.timeout(10000)}).then(r=>r.json());
+    const n=await fetchRetry(`${API}/v1/lightning/nodes/${pubkey}`,10000).then(r=>r.json());
     el.innerHTML=`
       <div class="nd-title">${escHtml(n.alias)||pubkey.slice(0,20)+'…'}</div>
       <div class="nd-grid">
@@ -109,7 +110,7 @@ async function loadNodeDetail(pubkey){
 
 async function loadHistory(){
   try{
-    const d=await fetch(`${API}/v1/lightning/statistics/2y`,{signal:AbortSignal.timeout(15000)}).then(r=>r.json());
+    const d=await fetchRetry(`${API}/v1/lightning/statistics/2y`,15000).then(r=>r.json());
     const el=document.getElementById('network-chart');
     if(!Array.isArray(d)||!d.length)return;
     const cur=d[0],old=d[d.length-1];
@@ -126,7 +127,7 @@ async function loadHistory(){
       <div class="bs-row"><span class="bs-key">총 용량</span><span class="bs-val">${((cur.total_capacity||0)/1e8).toFixed(0)} BTC <small style="color:${capDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(capDiff)}${capDiff.toFixed(0)}</small></span></div>
       <div class="bs-row"><span class="bs-key">기준</span><span class="bs-val" style="font-size:.65rem">2년 전 대비 변화</span></div>
     `;
-  }catch{}
+  }catch(e){console.error('loadHistory error:', e);}
 }
 
 document.getElementById('node-search').addEventListener('keydown',e=>{if(e.key==='Enter')searchNode();});
