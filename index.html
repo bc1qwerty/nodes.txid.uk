@@ -67,24 +67,24 @@
 <main id="main">
   <div class="hero">
     <h1>Lightning <span class="accent">Nodes</span></h1>
-    <p class="hero-sub">비트코인 라이트닝 네트워크 노드 탐색기</p>
+    <p class="hero-sub" data-ko="비트코인 라이트닝 네트워크 노드 탐색기" data-en="Bitcoin Lightning Network Node Explorer" data-ja="ビットコイン ライトニングネットワーク ノード探索">비트코인 라이트닝 네트워크 노드 탐색기</p>
   </div>
 
   <div class="content">
     <div class="search-row">
-      <input id="node-search" class="input" placeholder="노드 Public Key 또는 별칭 검색" aria-label="노드 검색" spellcheck="false">
-      <button class="btn" id="search-btn">검색</button>
+      <input id="node-search" class="input" placeholder="노드 Public Key 또는 별칭 검색" data-ko="노드 Public Key 또는 별칭 검색" data-en="Search by node public key or alias" data-ja="ノードPublic Keyまたはエイリアス検索" aria-label="노드 검색" spellcheck="false">
+      <button class="btn" id="search-btn" data-ko="검색" data-en="Search" data-ja="検索">검색</button>
     </div>
 
     <div id="global-stats" class="stats-grid"></div>
 
     <div class="two-col">
       <div class="card">
-        <div class="section-title"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-section"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 상위 노드 (용량 기준)</div>
+        <div class="section-title"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-section"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> <span data-ko="상위 노드 (용량 기준)" data-en="Top Nodes (by capacity)" data-ja="上位ノード (容量基準)">상위 노드 (용량 기준)</span></div>
         <div id="top-nodes"></div>
       </div>
       <div class="card">
-        <div class="section-title"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-section"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> 네트워크 히스토리</div>
+        <div class="section-title"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-section"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> <span data-ko="네트워크 히스토리" data-en="Network History" data-ja="ネットワーク履歴">네트워크 히스토리</span></div>
         <div id="network-chart"></div>
       </div>
     </div>
