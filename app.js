@@ -98,7 +98,7 @@ async function init(){
 function renderTopNodes(nodes){
   const el=document.getElementById('top-nodes');
   el.innerHTML=(nodes||[]).slice(0, window.innerWidth<600 ? 10 : 20).map((n,i)=>`
-    <div class="node-row" onclick="loadNodeDetail('${n.publicKey}')">
+    <div class="node-row" data-pubkey="${n.publicKey}" role="button" tabindex="0">
       <span class="node-rank">#${i+1}</span>
       <span class="node-alias">${escHtml(n.alias)||n.publicKey.slice(0,16)+'…'}</span>
       <span class="node-cap">${((n.capacity||0)/1e8).toFixed(2)} BTC</span>
@@ -162,6 +162,17 @@ async function loadHistory(){
 }
 
 document.getElementById('node-search').addEventListener('keydown',e=>{if(e.key==='Enter')searchNode();});
+// Event delegation for dynamically generated node rows
+document.getElementById('top-nodes')?.addEventListener('click', function(e) {
+  const row = e.target.closest('[data-pubkey]');
+  if (row) loadNodeDetail(row.dataset.pubkey);
+});
+document.getElementById('top-nodes')?.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const row = e.target.closest('[data-pubkey]');
+    if (row) loadNodeDetail(row.dataset.pubkey);
+  }
+});
 
 // Event listeners (moved from inline handlers)
 document.getElementById('lang-btn')?.addEventListener('click', toggleLang);
