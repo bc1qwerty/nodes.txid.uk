@@ -23,17 +23,48 @@ function toggleLang(){const m=document.getElementById('lang-menu');m?.classList.
 document.addEventListener('click',e=>{const m=document.getElementById('lang-menu');if(m&&!e.target.closest('.lang-dropdown')){m.classList.remove('open');document.getElementById('lang-btn')?.setAttribute('aria-expanded','false');}});
 (function(){setLang(lang);})();
 
+const T = {
+  loading: { ko:'로딩 중…', en:'Loading...', ja:'読み込み中…' },
+  dataLoading: { ko:'데이터 로딩 중…', en:'Loading data...', ja:'データ読み込み中…' },
+  searching: { ko:'검색 중…', en:'Searching...', ja:'検索中…' },
+  noResults: { ko:'검색 결과가 없습니다.', en:'No results found.', ja:'検索結果がありません。' },
+  searchError: { ko:'검색 중 오류가 발생했습니다.', en:'Search error occurred.', ja:'検索中にエラーが発生しました。' },
+  unknown: { ko:'알 수 없음', en:'Unknown', ja:'不明' },
+  totalNodes: { ko:'총 노드', en:'Total Nodes', ja:'総ノード' },
+  channels: { ko:'채널 수', en:'Channels', ja:'チャネル数' },
+  totalCapBtc: { ko:'총 용량 (BTC)', en:'Total Capacity (BTC)', ja:'総容量 (BTC)' },
+  avgChannelSize: { ko:'평균 채널 크기', en:'Avg Channel Size', ja:'平均チャネルサイズ' },
+  avgChannelsPerNode: { ko:'노드당 평균 채널', en:'Avg Channels/Node', ja:'ノード当たり平均チャネル' },
+  medianCapSat: { ko:'중앙값 용량(sat)', en:'Median Capacity (sat)', ja:'中央値容量(sat)' },
+  dataLoadFailed: { ko:'데이터를 불러올 수 없습니다.', en:'Failed to load data.', ja:'データを読み込めませんでした。' },
+  retry: { ko:'재시도', en:'Retry', ja:'再試行' },
+  totalCapacity: { ko:'총 용량', en:'Total Capacity', ja:'総容量' },
+  active: { ko:'활성', en:'active', ja:'アクティブ' },
+  country: { ko:'국가', en:'Country', ja:'国' },
+  firstSeen: { ko:'첫 등장', en:'First Seen', ja:'初出現' },
+  lastUpdate: { ko:'마지막 업데이트', en:'Last Updated', ja:'最終更新' },
+  nodeLoadFailed: { ko:'노드 정보 로드 실패', en:'Failed to load node info', ja:'ノード情報の読み込みに失敗しました' },
+  totalNodeCount: { ko:'총 노드 수', en:'Total Nodes', ja:'総ノード数' },
+  channelCount: { ko:'채널 수', en:'Channels', ja:'チャネル数' },
+  totalCapacityLabel: { ko:'총 용량', en:'Total Capacity', ja:'総容量' },
+  reference: { ko:'기준', en:'Reference', ja:'基準' },
+  change2y: { ko:'2년 전 대비 변화', en:'Change over 2 years', ja:'2年前からの変化' },
+  lightMode: { ko:'라이트 모드로 전환', en:'Switch to light mode', ja:'ライトモードに切替' },
+  darkMode: { ko:'다크 모드로 전환', en:'Switch to dark mode', ja:'ダークモードに切替' },
+};
+function t(key){ return (T[key]&&T[key][lang]) || (T[key]&&T[key].en) || key; }
+
 const API='https://mempool.space/api';
 (function(){
-  const t=localStorage.getItem('theme')||'dark';
-  document.documentElement.setAttribute('data-theme',t);
+  const th=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',th);
   updateThemeBtn();
 })();
 function updateThemeBtn(){
   const btn=document.getElementById('theme-btn');if(!btn)return;
   const isDark=document.documentElement.getAttribute('data-theme')!=='light';
   btn.innerHTML=isDark?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
-  btn.title=isDark?'라이트 모드로 전환':'다크 모드로 전환';
+  btn.title=isDark?t('lightMode'):t('darkMode');
 }
 function toggleTheme(){
   const h=document.documentElement;
@@ -43,8 +74,8 @@ function toggleTheme(){
 }
 
 async function init(){
-  document.getElementById('global-stats').innerHTML='<div class="empty" style="padding:20px;color:var(--text3)">데이터 로딩 중…</div>';
-  document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:20px;color:var(--text3)">로딩 중…</div>';
+  document.getElementById('global-stats').innerHTML='<div class="empty empty-loading">'+t('dataLoading')+'</div>';
+  document.getElementById('top-nodes').innerHTML='<div class="empty empty-loading">'+t('loading')+'</div>';
   try{
     const[stats,nodes]=await Promise.all([
       fetchRetry(`${API}/v1/lightning/statistics/latest`,10000).then(r=>r.json()),
@@ -52,16 +83,16 @@ async function init(){
     ]);
     const s=stats.latest||stats||{};
     document.getElementById('global-stats').innerHTML=`
-      <div class="stat-card"><div class="stat-val">${(s.node_count||0).toLocaleString()}</div><div class="stat-lbl">총 노드</div></div>
-      <div class="stat-card"><div class="stat-val">${(s.channel_count||0).toLocaleString()}</div><div class="stat-lbl">채널 수</div></div>
-      <div class="stat-card"><div class="stat-val">${((s.total_capacity||0)/1e8).toFixed(0)}</div><div class="stat-lbl">총 용량 (BTC)</div></div>
-      <div class="stat-card"><div class="stat-val">${((s.avg_capacity||0)/1e8).toFixed(4)}</div><div class="stat-lbl">평균 채널 크기</div></div>
-      <div class="stat-card"><div class="stat-val">${(s.avg_channels_per_node||0).toFixed(1)}</div><div class="stat-lbl">노드당 평균 채널</div></div>
-      <div class="stat-card"><div class="stat-val">${(s.med_capacity||0).toLocaleString()}</div><div class="stat-lbl">중앙값 용량(sat)</div></div>
+      <div class="stat-card"><div class="stat-val">${(s.node_count||0).toLocaleString()}</div><div class="stat-lbl">${t('totalNodes')}</div></div>
+      <div class="stat-card"><div class="stat-val">${(s.channel_count||0).toLocaleString()}</div><div class="stat-lbl">${t('channels')}</div></div>
+      <div class="stat-card"><div class="stat-val">${((s.total_capacity||0)/1e8).toFixed(0)}</div><div class="stat-lbl">${t('totalCapBtc')}</div></div>
+      <div class="stat-card"><div class="stat-val">${((s.avg_capacity||0)/1e8).toFixed(4)}</div><div class="stat-lbl">${t('avgChannelSize')}</div></div>
+      <div class="stat-card"><div class="stat-val">${(s.avg_channels_per_node||0).toFixed(1)}</div><div class="stat-lbl">${t('avgChannelsPerNode')}</div></div>
+      <div class="stat-card"><div class="stat-val">${(s.med_capacity||0).toLocaleString()}</div><div class="stat-lbl">${t('medianCapSat')}</div></div>
     `;
     renderTopNodes(nodes);
     loadHistory();
-  }catch(e){console.error('init error:', e); document.getElementById('global-stats').innerHTML=`<div class="empty">데이터를 불러올 수 없습니다. <button onclick="init()" style="margin-left:8px;padding:2px 8px;font-size:.72rem;cursor:pointer">재시도</button></div>`;}
+  }catch(e){console.error('init error:', e); document.getElementById('global-stats').innerHTML=`<div class="empty">${t('dataLoadFailed')} <button class="retry-btn" id="retry-init">${t('retry')}</button></div>`; document.getElementById('retry-init')?.addEventListener('click',init);}
 }
 
 function renderTopNodes(nodes){
@@ -78,34 +109,34 @@ function renderTopNodes(nodes){
 async function searchNode(){
   const q=document.getElementById('node-search').value.trim();
   if(!q)return;
-  document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:16px;color:var(--text3)">검색 중…</div>';
+  document.getElementById('top-nodes').innerHTML='<div class="empty empty-search">'+t('searching')+'</div>';
   if(/^[0-9a-f]{66}$/.test(q)){await loadNodeDetail(q);return;}
   try{
     const res=await fetchRetry(`${API}/v1/lightning/search?searchText=${encodeURIComponent(q)}&resultAmount=10`,10000).then(r=>r.json());
     const nodes=res.nodes||[];
-    if(!nodes.length){document.getElementById('top-nodes').innerHTML='<div class="empty" style="padding:16px;color:var(--text3)">검색 결과가 없습니다.</div>';return;}
+    if(!nodes.length){document.getElementById('top-nodes').innerHTML='<div class="empty empty-search">'+t('noResults')+'</div>';return;}
     if(nodes.length===1){await loadNodeDetail(nodes[0].publicKey);return;}
     renderTopNodes(nodes);
-  }catch(e){console.error('searchNode error:', e); document.getElementById('top-nodes').innerHTML=`<div class="empty" style="padding:16px;color:var(--red)">검색 중 오류가 발생했습니다.</div>`;}
+  }catch(e){console.error('searchNode error:', e); document.getElementById('top-nodes').innerHTML=`<div class="empty empty-error">${t('searchError')}</div>`;}
 }
 
 async function loadNodeDetail(pubkey){
   const el=document.getElementById('node-detail');
-  el.style.display='block';el.innerHTML='<div class="empty">로딩 중…</div>';
+  el.classList.remove('hidden');el.innerHTML='<div class="empty">'+t('loading')+'</div>';
   try{
     const n=await fetchRetry(`${API}/v1/lightning/nodes/${pubkey}`,10000).then(r=>r.json());
     el.innerHTML=`
       <div class="nd-title">${escHtml(n.alias)||pubkey.slice(0,20)+'…'}</div>
       <div class="nd-grid">
-        <div class="nd-item"><div class="nd-key">Public Key</div><div class="nd-val" style="font-size:.62rem;word-break:break-all">${pubkey}</div></div>
-        <div class="nd-item"><div class="nd-key">총 용량</div><div class="nd-val">${((n.capacity||0)/1e8).toFixed(4)} BTC</div></div>
-        <div class="nd-item"><div class="nd-key">채널 수</div><div class="nd-val">${(n.channels||0).toLocaleString()} 활성</div></div>
-        <div class="nd-item"><div class="nd-key">국가</div><div class="nd-val">${n.country?.en||n.city?.en||n.country?.de||'알 수 없음'||'알 수 없음'}</div></div>
-        <div class="nd-item"><div class="nd-key">첫 등장</div><div class="nd-val">${n.firstSeen?new Date(n.firstSeen*1000).toLocaleDateString('ko-KR'):'—'}</div></div>
-        <div class="nd-item"><div class="nd-key">마지막 업데이트</div><div class="nd-val">${n.updatedAt?new Date(n.updatedAt*1000).toLocaleDateString('ko-KR'):'—'}</div></div>
+        <div class="nd-item"><div class="nd-key">Public Key</div><div class="nd-val nd-pubkey">${pubkey}</div></div>
+        <div class="nd-item"><div class="nd-key">${t('totalCapacity')}</div><div class="nd-val">${((n.capacity||0)/1e8).toFixed(4)} BTC</div></div>
+        <div class="nd-item"><div class="nd-key">${t('channels')}</div><div class="nd-val">${(n.channels||0).toLocaleString()} ${t('active')}</div></div>
+        <div class="nd-item"><div class="nd-key">${t('country')}</div><div class="nd-val">${n.country?.en||n.city?.en||n.country?.de||t('unknown')}</div></div>
+        <div class="nd-item"><div class="nd-key">${t('firstSeen')}</div><div class="nd-val">${n.firstSeen?new Date(n.firstSeen*1000).toLocaleDateString(lang==='ja'?'ja-JP':lang==='en'?'en-US':'ko-KR'):'—'}</div></div>
+        <div class="nd-item"><div class="nd-key">${t('lastUpdate')}</div><div class="nd-val">${n.updatedAt?new Date(n.updatedAt*1000).toLocaleDateString(lang==='ja'?'ja-JP':lang==='en'?'en-US':'ko-KR'):'—'}</div></div>
       </div>`;
     el.scrollIntoView({behavior:'smooth'});
-  }catch(e){el.innerHTML=`<div class="empty">노드 정보 로드 실패</div>`;}
+  }catch(e){el.innerHTML=`<div class="empty">${t('nodeLoadFailed')}</div>`;}
 }
 
 async function loadHistory(){
@@ -120,15 +151,25 @@ async function loadHistory(){
     const capDiff=(cur.total_capacity-old.total_capacity)/1e8;
     const sign=v=>v>0?'+':'';
     el.innerHTML=`
-      <div class="bs-row"><span class="bs-key">총 노드 수</span><span class="bs-val">${getNodes(cur).toLocaleString()} <small style="color:${ndDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(ndDiff)}${ndDiff.toLocaleString()}</small></span></div>
+      <div class="bs-row"><span class="bs-key">${t('totalNodeCount')}</span><span class="bs-val">${getNodes(cur).toLocaleString()} <small class="${ndDiff>=0?'diff-positive':'diff-negative'}">${sign(ndDiff)}${ndDiff.toLocaleString()}</small></span></div>
       <div class="bs-row"><span class="bs-key">Clearnet</span><span class="bs-val">${(cur.clearnet_nodes||0).toLocaleString()}</span></div>
       <div class="bs-row"><span class="bs-key">Tor</span><span class="bs-val">${(cur.tor_nodes||0).toLocaleString()}</span></div>
-      <div class="bs-row"><span class="bs-key">채널 수</span><span class="bs-val">${cur.channel_count.toLocaleString()} <small style="color:${chDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(chDiff)}${chDiff.toLocaleString()}</small></span></div>
-      <div class="bs-row"><span class="bs-key">총 용량</span><span class="bs-val">${((cur.total_capacity||0)/1e8).toFixed(0)} BTC <small style="color:${capDiff>=0?'#3fb950':'#f85149'};font-size:.65rem">${sign(capDiff)}${capDiff.toFixed(0)}</small></span></div>
-      <div class="bs-row"><span class="bs-key">기준</span><span class="bs-val" style="font-size:.65rem">2년 전 대비 변화</span></div>
+      <div class="bs-row"><span class="bs-key">${t('channelCount')}</span><span class="bs-val">${cur.channel_count.toLocaleString()} <small class="${chDiff>=0?'diff-positive':'diff-negative'}">${sign(chDiff)}${chDiff.toLocaleString()}</small></span></div>
+      <div class="bs-row"><span class="bs-key">${t('totalCapacityLabel')}</span><span class="bs-val">${((cur.total_capacity||0)/1e8).toFixed(0)} BTC <small class="${capDiff>=0?'diff-positive':'diff-negative'}">${sign(capDiff)}${capDiff.toFixed(0)}</small></span></div>
+      <div class="bs-row"><span class="bs-key">${t('reference')}</span><span class="bs-val bs-val-small">${t('change2y')}</span></div>
     `;
   }catch(e){console.error('loadHistory error:', e);}
 }
 
 document.getElementById('node-search').addEventListener('keydown',e=>{if(e.key==='Enter')searchNode();});
+
+// Event listeners (moved from inline handlers)
+document.getElementById('lang-btn')?.addEventListener('click', toggleLang);
+document.querySelectorAll('#lang-menu button').forEach(function(btn) {
+  var lang = btn.textContent === '한국어' ? 'ko' : btn.textContent === 'English' ? 'en' : 'ja';
+  btn.addEventListener('click', function() { setLang(lang); });
+});
+document.getElementById('theme-btn')?.addEventListener('click', toggleTheme);
+document.getElementById('search-btn')?.addEventListener('click', searchNode);
+
 init();
