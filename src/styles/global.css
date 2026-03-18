@@ -11,6 +11,7 @@
   --text2: #8b949e;
   --text3: #6e7681;
   --accent: #f7931a;
+  --accent-text: #f7931a;
   --accent2: #e07b10;
   --green: #3fb950;
   --red: #f85149;
@@ -30,6 +31,7 @@
   --text2: #656d76;
   --text3: #8c959f;
   --accent: #bc4e00;
+  --accent-text: #b34700;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,17 +50,15 @@ a { color: inherit; text-decoration: none; }
 /* ── Header ── */
 header { background: var(--bg2); border-bottom: 1px solid var(--border); position: sticky; top: var(--gnav-h, 0px); z-index: 100; }
 .nav-top { max-width: var(--max-w); margin: 0 auto; padding: 0 20px; height: 48px; display: flex; align-items: center; gap: 12px; }
-.logo { display: flex; align-items: center; font-family: var(--font); font-size: 1rem; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: .05em; flex-shrink: 0; }
+.logo { display: flex; align-items: center; font-family: var(--font); font-size: 1rem; font-weight: 700; color: var(--accent-text); text-decoration: none; letter-spacing: .05em; flex-shrink: 0; }
 .logo:hover { opacity: .8; }
 .icon-inline { flex-shrink: 0; margin-right: 6px; }
 .logo-sep { color: var(--border); font-family: var(--font); font-size: .9rem; margin: 0 2px; }
 .logo-sub { font-family: var(--font); font-size: .8rem; color: var(--text3); }
-.nav-links { display: flex; align-items: center; gap: 4px; }
-.nav-links a { color: var(--text2); font-size: .8rem; padding: 6px 12px; border-radius: 4px; transition: all .2s; text-decoration: none; font-family: var(--font-ko); position: relative; }
-.nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 0; height: 2px; background: var(--accent); border-radius: 1px; transition: width .2s; }
+.nav-links { display: flex; align-items: center; gap: 4px; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--border); }
+.nav-links a { color: var(--text2); font-size: .78rem; padding: 5px 10px; border-radius: 4px; font-family: var(--font-ko); transition: all .2s; white-space: nowrap; text-decoration: none; }
 .nav-links a:hover { color: var(--accent); background: rgba(247,147,26,.06); }
 .nav-links a.active { color: var(--accent); background: rgba(247,147,26,.08); }
-.nav-links a.active::after { width: 60%; }
 .nav-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
 .auth-mount { position: relative; display: inline-flex; }
 
@@ -82,7 +82,7 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
 /* ── Hero ── */
 .hero { text-align: center; padding: 52px 20px 32px; }
 .hero h1 { font-family: var(--font); font-size: 2.2rem; font-weight: 700; margin-bottom: 10px; }
-.accent { color: var(--accent); }
+.accent { color: var(--accent-text); }
 .hero-sub { color: var(--text2); font-size: .9rem; }
 
 /* ── Content ── */
@@ -98,7 +98,7 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
 .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
 .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; transition: transform .2s, box-shadow .2s; }
 .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.15); }
-.stat-val { font-family: var(--font); font-size: 1.3rem; font-weight: 700; color: var(--accent); }
+.stat-val { font-family: var(--font); font-size: 1.3rem; font-weight: 700; color: var(--accent-text); }
 .stat-lbl { font-size: .65rem; color: var(--text3); font-family: var(--font-ko); margin-top: 4px; text-transform: uppercase; }
 
 /* ── Two column ── */
@@ -118,7 +118,7 @@ header { background: var(--bg2); border-bottom: 1px solid var(--border); positio
 
 /* ── Node detail ── */
 .node-detail { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; }
-.nd-title { font-size: .95rem; font-weight: 600; color: var(--accent); font-family: var(--font); margin-bottom: 16px; word-break: break-all; }
+.nd-title { font-size: .95rem; font-weight: 600; color: var(--accent-text); font-family: var(--font); margin-bottom: 16px; word-break: break-all; }
 .nd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .nd-item { background: var(--bg3); border-radius: 7px; padding: 12px; }
 .nd-key { font-size: .65rem; color: var(--text3); font-family: var(--font-ko); margin-bottom: 4px; }

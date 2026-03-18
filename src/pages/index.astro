@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import Header from '@txid/ui/components/Header.astro';
-import AppBar from '@txid/ui/components/AppBar.astro';
 import Footer from '../components/Footer.astro';
 import '../styles/global.css';
 ---
@@ -48,7 +47,6 @@ import '../styles/global.css';
   </main>
 
   <Footer />
-  <AppBar activeHost="nodes.txid.uk" />
 
   <script>
     function escHtml(s: string) {
@@ -237,10 +235,10 @@ import '../styles/global.css';
           <div class="nd-grid">
             <div class="nd-item"><div class="nd-key">Public Key</div><div class="nd-val nd-pubkey">${pubkey}</div></div>
             <div class="nd-item"><div class="nd-key">${t('totalCapacity')}</div><div class="nd-val">${((n.capacity || 0) / 1e8).toFixed(4)} BTC</div></div>
-            <div class="nd-item"><div class="nd-key">${t('channels')}</div><div class="nd-val">${(n.channels || 0).toLocaleString()} ${t('active')}</div></div>
+            <div class="nd-item"><div class="nd-key">${t('channels')}</div><div class="nd-val">${(n.active_channel_count || n.channels || 0).toLocaleString()} ${t('active')}</div></div>
             <div class="nd-item"><div class="nd-key">${t('country')}</div><div class="nd-val">${n.country?.en || n.city?.en || n.country?.de || t('unknown')}</div></div>
-            <div class="nd-item"><div class="nd-key">${t('firstSeen')}</div><div class="nd-val">${n.firstSeen ? new Date(n.firstSeen * 1000).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang === 'en' ? 'en-US' : 'ko-KR') : '—'}</div></div>
-            <div class="nd-item"><div class="nd-key">${t('lastUpdate')}</div><div class="nd-val">${n.updatedAt ? new Date(n.updatedAt * 1000).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang === 'en' ? 'en-US' : 'ko-KR') : '—'}</div></div>
+            <div class="nd-item"><div class="nd-key">${t('firstSeen')}</div><div class="nd-val">${(n.first_seen || n.firstSeen) ? new Date((n.first_seen || n.firstSeen) * 1000).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang === 'en' ? 'en-US' : 'ko-KR') : '—'}</div></div>
+            <div class="nd-item"><div class="nd-key">${t('lastUpdate')}</div><div class="nd-val">${(n.updated_at || n.updatedAt) ? new Date((n.updated_at || n.updatedAt) * 1000).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang === 'en' ? 'en-US' : 'ko-KR') : '—'}</div></div>
           </div>`;
         el.scrollIntoView({ behavior: 'smooth' });
       } catch (e) {
